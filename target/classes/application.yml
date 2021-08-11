@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: crawler
+
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 0
+
+httpClient:
+  connectTimeout.milliseconds : 1000
+  writeTimeout.milliseconds: 1000
+  readTimeout.milliseconds: 1000
+  retryNum: 2
