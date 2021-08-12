@@ -10,5 +10,5 @@ public interface WeiBoJsonpHtmlService {
 
     int parsePageSize(String html);
 
-    List<WeiboDomain> parseData(String html);
+    List<WeiboDomain> parseData(String html, String realCookie);
 }

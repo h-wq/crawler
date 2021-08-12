@@ -45,7 +45,7 @@ public class WeiBoCrawlerController {
                                                     @RequestParam(name = "start_time", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH") LocalDateTime startTime,
                                                     @RequestParam(name = "end_time", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH") LocalDateTime endTime,
                                                     @RequestParam(name = "page", defaultValue = "1")  int page) {
-        String cookie = "login_sid_t=de193cdb5705dbbec9845b1ff1066006; cross_origin_proto=SSL; _s_tentry=passport.weibo.com; Apache=2715213965734.049.1628528513163; SINAGLOBAL=2715213965734.049.1628528513163; ULV=1628528513170:1:1:1:2715213965734.049.1628528513163:; SUB=_2A25MFS_PDeRhGeFL71oU8C_MzDSIHXVvYwYHrDV8PUNbmtAKLXj7kW9NQhCB-UjODzESPbi_Voohuvv-YROzqC4c; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WW-2o2RjP0Yzwkqbav6N2vD5JpX5KzhUgL.FoMfShnfeh27S0n2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMNSKBRSK5pehMR; ALF=1660064543; SSOLoginState=1628528543; wvr=6; webim_unReadCount=%7B%22time%22%3A1628528623363%2C%22dm_pub_total%22%3A5%2C%22chat_group_client%22%3A0%2C%22chat_group_notice%22%3A0%2C%22allcountNum%22%3A35%2C%22msgbox%22%3A0%7D";
+        String cookie = "login_sid_t=de193cdb5705dbbec9845b1ff1066006; cross_origin_proto=SSL; _s_tentry=passport.weibo.com; Apache=2715213965734.049.1628528513163; SINAGLOBAL=2715213965734.049.1628528513163; ULV=1628528513170:1:1:1:2715213965734.049.1628528513163:; SSOLoginState=1628528543; wvr=6; wb_view_log_7548501078=1440*9002; WBtopGlobal_register_version=2021081123; SUB=_2A25MF5bGDeRhGeFL71oU8C_MzDSIHXVvZI8OrDV8PUNbmtAKLRbdkW9NQhCB-Q-sVFtZYUjPosyDSEbvTFK_duQ1; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WW-2o2RjP0Yzwkqbav6N2vD5JpX5KzhUgL.FoMfShnfeh27S0n2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMNSKBRSK5pehMR; ALF=1660230166; webim_unReadCount=%7B%22time%22%3A1628696645024%2C%22dm_pub_total%22%3A5%2C%22chat_group_client%22%3A0%2C%22chat_group_notice%22%3A0%2C%22allcountNum%22%3A41%2C%22msgbox%22%3A0%7D";
         String jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, null), cookie);
         int pageCount = weiBoJsonpHtmlService.parsePageCount(jsonStr);
         if (page < 1 || page > pageCount) {
@@ -54,7 +54,7 @@ public class WeiBoCrawlerController {
         if (page == pageCount) {
             int firstPageSize = weiBoJsonpHtmlService.parsePageSize(jsonStr);
             jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, page), cookie);
-            List<WeiboDomain> weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr);
+            List<WeiboDomain> weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr, cookie);
             PageResult<WeiboDomain> result = new PageResult<>();
             result.setPageNum(page);
             result.setPageSize(weiboDomains.size());
@@ -67,10 +67,10 @@ public class WeiBoCrawlerController {
             int lastPageSize =  weiBoJsonpHtmlService.parsePageSize(lastPageJsonStr);
             List<WeiboDomain> weiboDomains;
             if (page == 1) {
-                weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr);
+                weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr, cookie);
             } else {
                 jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, page), cookie);
-                weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr);
+                weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr, cookie);
             }
             PageResult<WeiboDomain> result = new PageResult<>();
             result.setPageNum(page);
@@ -87,16 +87,16 @@ public class WeiBoCrawlerController {
                        @RequestParam(name = "start_time", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH") LocalDateTime startTime,
                        @RequestParam(name = "end_time", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH") LocalDateTime endTime,
                        HttpServletResponse response) {
-        String cookie = "login_sid_t=de193cdb5705dbbec9845b1ff1066006; cross_origin_proto=SSL; _s_tentry=passport.weibo.com; Apache=2715213965734.049.1628528513163; SINAGLOBAL=2715213965734.049.1628528513163; ULV=1628528513170:1:1:1:2715213965734.049.1628528513163:; SUB=_2A25MFS_PDeRhGeFL71oU8C_MzDSIHXVvYwYHrDV8PUNbmtAKLXj7kW9NQhCB-UjODzESPbi_Voohuvv-YROzqC4c; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WW-2o2RjP0Yzwkqbav6N2vD5JpX5KzhUgL.FoMfShnfeh27S0n2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMNSKBRSK5pehMR; ALF=1660064543; SSOLoginState=1628528543; wvr=6; webim_unReadCount=%7B%22time%22%3A1628528623363%2C%22dm_pub_total%22%3A5%2C%22chat_group_client%22%3A0%2C%22chat_group_notice%22%3A0%2C%22allcountNum%22%3A35%2C%22msgbox%22%3A0%7D";
+        String cookie = "login_sid_t=de193cdb5705dbbec9845b1ff1066006; cross_origin_proto=SSL; _s_tentry=passport.weibo.com; Apache=2715213965734.049.1628528513163; SINAGLOBAL=2715213965734.049.1628528513163; ULV=1628528513170:1:1:1:2715213965734.049.1628528513163:; SSOLoginState=1628528543; wvr=6; wb_view_log_7548501078=1440*9002; WBtopGlobal_register_version=2021081123; SUB=_2A25MF5bGDeRhGeFL71oU8C_MzDSIHXVvZI8OrDV8PUNbmtAKLRbdkW9NQhCB-Q-sVFtZYUjPosyDSEbvTFK_duQ1; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WW-2o2RjP0Yzwkqbav6N2vD5JpX5KzhUgL.FoMfShnfeh27S0n2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMNSKBRSK5pehMR; ALF=1660230166; webim_unReadCount=%7B%22time%22%3A1628696645024%2C%22dm_pub_total%22%3A5%2C%22chat_group_client%22%3A0%2C%22chat_group_notice%22%3A0%2C%22allcountNum%22%3A41%2C%22msgbox%22%3A0%7D";
         String jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, null), cookie);
         int pageCount = weiBoJsonpHtmlService.parsePageCount(jsonStr);
-        List<WeiboDomain> weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr);
+        List<WeiboDomain> weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr, cookie);
         List<WeiboDomain> allWeiboDomains = new ArrayList<>(weiboDomains);
         for (int i = 2; i <= pageCount; i++) {
             int finalI = i;
             pageParseCompleteService.submit(() -> {
                 String pageJsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, finalI), cookie);
-                return weiBoJsonpHtmlService.parseData(pageJsonStr);
+                return weiBoJsonpHtmlService.parseData(pageJsonStr, cookie);
             });
         }
         for (int i = 2; i <= pageCount; i++) {

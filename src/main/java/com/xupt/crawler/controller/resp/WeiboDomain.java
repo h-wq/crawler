@@ -17,35 +17,43 @@ public class WeiboDomain {
     @CSVCell(value = "name", order = 2)
     private String name;
 
-    @ExcelColumn(header = "txt", order = 3)
-    @CSVCell(value = "txt", order = 3)
+    @ExcelColumn(header = "fans", order = 3)
+    @CSVCell(value = "fans", order = 3)
+    private String fans;
+
+    @ExcelColumn(header = "address", order = 4)
+    @CSVCell(value = "address", order = 4)
+    private String address;
+
+    @ExcelColumn(header = "txt", order = 5)
+    @CSVCell(value = "txt", order = 5)
     private String txt;
 
-    @ExcelColumn(header = "img", order = 4)
-    @CSVCell(value = "img", order = 4)
+    @ExcelColumn(header = "img", order = 6)
+    @CSVCell(value = "img", order = 6)
     private String img;
 
-    @ExcelColumn(header = "date", order = 5)
-    @CSVCell(value = "date", order = 5)
+    @ExcelColumn(header = "date", order = 7)
+    @CSVCell(value = "date", order = 7)
     private String date;
 
-    @ExcelColumn(header = "relayNum", order = 6)
-    @CSVCell(value = "relayNum", order = 6)
+    @ExcelColumn(header = "relayNum", order = 8)
+    @CSVCell(value = "relayNum", order = 8)
     private String relayNum;
 
-    @ExcelColumn(header = "comment", order = 7)
-    @CSVCell(value = "comment", order = 7)
+    @ExcelColumn(header = "comment", order = 9)
+    @CSVCell(value = "comment", order = 9)
     private String comment;
 
-    @ExcelColumn(header = "likes", order = 8)
-    @CSVCell(value = "likes", order = 8)
+    @ExcelColumn(header = "likes", order = 10)
+    @CSVCell(value = "likes", order = 10)
     private String likes;
 
-    @ExcelColumn(header = "relayUidList", order = 9)
-    @CSVCell(value = "relayUidList", order = 9)
+    @ExcelColumn(header = "relayUidList", order = 11)
+    @CSVCell(value = "relayUidList", order = 11)
     private String relayUidList;
 
-    @ExcelColumn(header = "relayNames", order = 10)
-    @CSVCell(value = "relayNames", order = 10)
+    @ExcelColumn(header = "relayNames", order = 12)
+    @CSVCell(value = "relayNames", order = 12)
     private String relayNames;
 }

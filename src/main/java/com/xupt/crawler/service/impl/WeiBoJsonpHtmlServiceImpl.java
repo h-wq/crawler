@@ -65,12 +65,12 @@ public class WeiBoJsonpHtmlServiceImpl implements WeiBoJsonpHtmlService {
     }
 
     @Override
-    public List<WeiboDomain> parseData(String html) {
+    public List<WeiboDomain> parseData(String html, String realCookie) {
         List<WeiboDomain> weiboDomains = new ArrayList<>();
         Document doc = Jsoup.parse(html);
         Elements cardWraps = doc.getElementsByClass("card-wrap");
         for (Element element : cardWraps) {
-            parseCompleteService.submit(() -> parseSingleData(element));
+            parseCompleteService.submit(() -> parseSingleData(element, realCookie));
 //            WeiboDomain weiboDomain = parseSingleData(element);
 //            if (weiboDomain != null) {
 //                weiboDomains.add(weiboDomain);
@@ -89,7 +89,7 @@ public class WeiBoJsonpHtmlServiceImpl implements WeiBoJsonpHtmlService {
         return weiboDomains;
     }
 
-    private WeiboDomain parseSingleData(Element element) {
+    private WeiboDomain parseSingleData(Element element, String realCookie) {
         if (element.getElementsByClass("name").isEmpty()) {
             return null;
         }
@@ -100,6 +100,33 @@ public class WeiBoJsonpHtmlServiceImpl implements WeiBoJsonpHtmlService {
         }
         String uid = user.attr("href").replace("//", "").split("/")[1];
         uid = uid.substring(0, uid.indexOf("?"));
+
+        String homepageLink = "https://weibo.com/u/" + uid;
+        String homepageJsonStr = crawlerService.getHtml(homepageLink, realCookie);
+        if (uid.equals("3108585423")) {
+            System.out.println("knjdnfjnjnf" + uid + "djjfjfjn" + homepageJsonStr);
+        }
+        String fans = Strings.EMPTY;
+        if (homepageJsonStr.contains("粉丝")) {
+            int index = homepageJsonStr.indexOf("粉丝");
+            fans = homepageJsonStr.substring(index - 53, index - 33);
+            for (int i = fans.length() - 1; i >= 0; i--) {
+                String numStr = fans.charAt(i) + "";
+                try {
+                    Integer.parseInt(numStr);
+                } catch (Exception e) {
+                    fans = fans.substring(i + 1);
+                    break;
+                }
+            }
+        }
+        String address = Strings.EMPTY;
+        if (homepageJsonStr.contains("<span class=\\\"item_text W_fl\\\">")) {
+            int index = homepageJsonStr.indexOf("<span class=\\\"item_text W_fl\\\">");
+            address = homepageJsonStr.substring(index + 31, index + 101)
+                    .replaceAll("\\\\r", "").replaceAll("\\\\n", "").replaceAll("\\\\t", "").replaceAll(" ", "");
+        }
+
         String txt = getLabelHtml(element, "txt");
         String img = Strings.EMPTY;
         if (element.getElementsByClass("m1 w1 c1").size() > 0) {
@@ -160,6 +187,8 @@ public class WeiBoJsonpHtmlServiceImpl implements WeiBoJsonpHtmlService {
         WeiboDomain weiboDomain = new WeiboDomain();
         weiboDomain.setUid(uid);
         weiboDomain.setName(name);
+        weiboDomain.setFans(fans);
+        weiboDomain.setAddress(address);
         weiboDomain.setTxt(txt);
         weiboDomain.setImg(img);
         weiboDomain.setDate(date);
