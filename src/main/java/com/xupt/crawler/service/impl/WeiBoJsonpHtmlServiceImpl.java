@@ -15,6 +15,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +72,7 @@ public class WeiBoJsonpHtmlServiceImpl implements WeiBoJsonpHtmlService {
         Elements cardWraps = doc.getElementsByClass("card-wrap");
         for (Element element : cardWraps) {
             parseCompleteService.submit(() -> parseSingleData(element, realCookie));
-//            WeiboDomain weiboDomain = parseSingleData(element);
+//            WeiboDomain weiboDomain = parseSingleData(element, realCookie);
 //            if (weiboDomain != null) {
 //                weiboDomains.add(weiboDomain);
 //            }
@@ -103,9 +104,6 @@ public class WeiBoJsonpHtmlServiceImpl implements WeiBoJsonpHtmlService {
 
         String homepageLink = "https://weibo.com/u/" + uid;
         String homepageJsonStr = crawlerService.getHtml(homepageLink, realCookie);
-        if (uid.equals("3108585423")) {
-            System.out.println("knjdnfjnjnf" + uid + "djjfjfjn" + homepageJsonStr);
-        }
         String fans = Strings.EMPTY;
         if (homepageJsonStr.contains("粉丝")) {
             int index = homepageJsonStr.indexOf("粉丝");
@@ -121,10 +119,19 @@ public class WeiBoJsonpHtmlServiceImpl implements WeiBoJsonpHtmlService {
             }
         }
         String address = Strings.EMPTY;
-        if (homepageJsonStr.contains("<span class=\\\"item_text W_fl\\\">")) {
+        while (homepageJsonStr.contains("<span class=\\\"item_text W_fl\\\">")) {
             int index = homepageJsonStr.indexOf("<span class=\\\"item_text W_fl\\\">");
-            address = homepageJsonStr.substring(index + 31, index + 101)
+            String s = homepageJsonStr.substring(index + 31, index + 201)
                     .replaceAll("\\\\r", "").replaceAll("\\\\n", "").replaceAll("\\\\t", "").replaceAll(" ", "");
+            s = s.substring(0, !s.contains("<\\/span>") ? s.length() : s.indexOf("<\\/span>"));
+            if (!s.contains("<") && !s.contains(">") && !StringUtils.isEmpty(s)) {
+                address = s;
+                break;
+            }
+            homepageJsonStr = homepageJsonStr.substring(index + 31);
+        }
+        if (address.length() > 10) {
+            address = Strings.EMPTY;
         }
 
         String txt = getLabelHtml(element, "txt");
