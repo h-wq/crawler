@@ -5,18 +5,17 @@ import com.xupt.crawler.controller.page.PageResult;
 import com.xupt.crawler.controller.resp.WeiboDomain;
 import com.xupt.crawler.service.CrawlerService;
 import com.xupt.crawler.service.WeiBoJsonpHtmlService;
-import com.xupt.crawler.utils.CSV.CSVUtils;
 import com.xupt.crawler.utils.excel.ExcelUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -41,11 +40,14 @@ public class WeiBoCrawlerController {
     private final ExecutorCompletionService<List<WeiboDomain>> pageParseCompleteService = new ExecutorCompletionService<>(pageParseExecutor);
 
     @GetMapping("/list")
-    public JsonResult<PageResult<WeiboDomain>> list(@RequestParam(name = "q") String q,
+    public JsonResult<PageResult<WeiboDomain>> list(@RequestParam(name = "cookie", required = false) String cookie,
+                                                    @RequestParam(name = "q") String q,
                                                     @RequestParam(name = "start_time", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH") LocalDateTime startTime,
                                                     @RequestParam(name = "end_time", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH") LocalDateTime endTime,
                                                     @RequestParam(name = "page", defaultValue = "1")  int page) {
-        String cookie = "login_sid_t=de193cdb5705dbbec9845b1ff1066006; cross_origin_proto=SSL; _s_tentry=passport.weibo.com; Apache=2715213965734.049.1628528513163; SINAGLOBAL=2715213965734.049.1628528513163; ULV=1628528513170:1:1:1:2715213965734.049.1628528513163:; SSOLoginState=1628528543; wvr=6; wb_view_log_7548501078=1440*9002; WBtopGlobal_register_version=2021081123; SUB=_2A25MF5bGDeRhGeFL71oU8C_MzDSIHXVvZI8OrDV8PUNbmtAKLRbdkW9NQhCB-Q-sVFtZYUjPosyDSEbvTFK_duQ1; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WW-2o2RjP0Yzwkqbav6N2vD5JpX5KzhUgL.FoMfShnfeh27S0n2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMNSKBRSK5pehMR; ALF=1660230166; webim_unReadCount=%7B%22time%22%3A1628696645024%2C%22dm_pub_total%22%3A5%2C%22chat_group_client%22%3A0%2C%22chat_group_notice%22%3A0%2C%22allcountNum%22%3A41%2C%22msgbox%22%3A0%7D";
+        if (StringUtils.isEmpty(cookie)) {
+            cookie = "login_sid_t=de193cdb5705dbbec9845b1ff1066006; cross_origin_proto=SSL; _s_tentry=passport.weibo.com; Apache=2715213965734.049.1628528513163; SINAGLOBAL=2715213965734.049.1628528513163; ULV=1628528513170:1:1:1:2715213965734.049.1628528513163:; SSOLoginState=1628528543; wvr=6; ALF=1631292502; SUB=_2A25MF48GDeRhGeFO71cZ9ynKzD2IHXVv-xFOrDV8PUJbkNAKLUKskW1NQX2SaHrDwd-OBaDRnNkQbwAsvGwGrcqS; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWy-0OHLUGk2zHbbephEVRn5JpX5oz75NHD95QNehBf1hMNSoMpWs4Dqcjqi--fi-2Ei-2Ri--Ri-i2i-24eo5pSK5f; webim_unReadCount=%7B%22time%22%3A1628866976870%2C%22dm_pub_total%22%3A4%2C%22chat_group_client%22%3A0%2C%22chat_group_notice%22%3A0%2C%22allcountNum%22%3A63%2C%22msgbox%22%3A0%7D";
+        }
         String jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, null), cookie);
         int pageCount = weiBoJsonpHtmlService.parsePageCount(jsonStr);
         if (page < 1 || page > pageCount) {
@@ -83,20 +85,24 @@ public class WeiBoCrawlerController {
     }
 
     @GetMapping("/export")
-    public void export(@RequestParam(name = "q") String q,
+    public void export(@RequestParam(name = "cookie", required = false) String cookie,
+                       @RequestParam(name = "q") String q,
                        @RequestParam(name = "start_time", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH") LocalDateTime startTime,
                        @RequestParam(name = "end_time", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH") LocalDateTime endTime,
                        HttpServletResponse response) {
-        String cookie = "login_sid_t=de193cdb5705dbbec9845b1ff1066006; cross_origin_proto=SSL; _s_tentry=passport.weibo.com; Apache=2715213965734.049.1628528513163; SINAGLOBAL=2715213965734.049.1628528513163; ULV=1628528513170:1:1:1:2715213965734.049.1628528513163:; SSOLoginState=1628528543; wvr=6; wb_view_log_7548501078=1440*9002; WBtopGlobal_register_version=2021081123; SUB=_2A25MF5bGDeRhGeFL71oU8C_MzDSIHXVvZI8OrDV8PUNbmtAKLRbdkW9NQhCB-Q-sVFtZYUjPosyDSEbvTFK_duQ1; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WW-2o2RjP0Yzwkqbav6N2vD5JpX5KzhUgL.FoMfShnfeh27S0n2dJLoIp7LxKML1KBLBKnLxKqL1hnLBoMNSKBRSK5pehMR; ALF=1660230166; webim_unReadCount=%7B%22time%22%3A1628696645024%2C%22dm_pub_total%22%3A5%2C%22chat_group_client%22%3A0%2C%22chat_group_notice%22%3A0%2C%22allcountNum%22%3A41%2C%22msgbox%22%3A0%7D";
+        if (StringUtils.isEmpty(cookie)) {
+            cookie = "login_sid_t=de193cdb5705dbbec9845b1ff1066006; cross_origin_proto=SSL; _s_tentry=passport.weibo.com; Apache=2715213965734.049.1628528513163; SINAGLOBAL=2715213965734.049.1628528513163; ULV=1628528513170:1:1:1:2715213965734.049.1628528513163:; SSOLoginState=1628528543; wvr=6; ALF=1631292502; SUB=_2A25MF48GDeRhGeFO71cZ9ynKzD2IHXVv-xFOrDV8PUJbkNAKLUKskW1NQX2SaHrDwd-OBaDRnNkQbwAsvGwGrcqS; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWy-0OHLUGk2zHbbephEVRn5JpX5oz75NHD95QNehBf1hMNSoMpWs4Dqcjqi--fi-2Ei-2Ri--Ri-i2i-24eo5pSK5f; webim_unReadCount=%7B%22time%22%3A1628866976870%2C%22dm_pub_total%22%3A4%2C%22chat_group_client%22%3A0%2C%22chat_group_notice%22%3A0%2C%22allcountNum%22%3A63%2C%22msgbox%22%3A0%7D";
+        }
         String jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, null), cookie);
         int pageCount = weiBoJsonpHtmlService.parsePageCount(jsonStr);
         List<WeiboDomain> weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr, cookie);
         List<WeiboDomain> allWeiboDomains = new ArrayList<>(weiboDomains);
+        String finalCookie = cookie;
         for (int i = 2; i <= pageCount; i++) {
             int finalI = i;
             pageParseCompleteService.submit(() -> {
-                String pageJsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, finalI), cookie);
-                return weiBoJsonpHtmlService.parseData(pageJsonStr, cookie);
+                String pageJsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, finalI), finalCookie);
+                return weiBoJsonpHtmlService.parseData(pageJsonStr, finalCookie);
             });
         }
         for (int i = 2; i <= pageCount; i++) {
