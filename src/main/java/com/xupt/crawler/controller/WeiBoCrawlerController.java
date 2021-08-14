@@ -35,7 +35,7 @@ public class WeiBoCrawlerController {
     @Autowired
     private WeiBoJsonpHtmlService weiBoJsonpHtmlService;
 
-    private final Executor pageParseExecutor = Executors.newWorkStealingPool(10);
+    private final Executor pageParseExecutor = Executors.newWorkStealingPool(2);
 
     private final ExecutorCompletionService<List<WeiboDomain>> pageParseCompleteService = new ExecutorCompletionService<>(pageParseExecutor);
 

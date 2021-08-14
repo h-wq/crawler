@@ -1,5 +1,7 @@
-package com.xupt.crawler.service;
+package com.xupt.crawler.service.impl;
 
+import com.xupt.crawler.service.CrawlerService;
+import com.xupt.crawler.service.WeiBoCookieService;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import org.apache.logging.log4j.util.Strings;

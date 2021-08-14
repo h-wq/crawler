@@ -34,7 +34,7 @@ public class WeiBoJsonpHtmlServiceImpl implements WeiBoJsonpHtmlService {
     @Autowired
     private CrawlerService crawlerService;
 
-    private final Executor parseExecutor = Executors.newWorkStealingPool(4);
+    private final Executor parseExecutor = Executors.newWorkStealingPool(10);
 
     private final ExecutorCompletionService<WeiboDomain> parseCompleteService = new ExecutorCompletionService<>(parseExecutor);
 
