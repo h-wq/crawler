@@ -103,7 +103,12 @@ public class WeiBoJsonpHtmlServiceImpl implements WeiBoJsonpHtmlService {
         uid = uid.substring(0, uid.indexOf("?"));
 
         String homepageLink = "https://weibo.com/u/" + uid;
-        String homepageJsonStr = crawlerService.getHtml(homepageLink, realCookie);
+        String homepageJsonStr;
+        try {
+            homepageJsonStr = crawlerService.getHtml(homepageLink, realCookie, true);
+        } catch (Exception e) {
+            homepageJsonStr = crawlerService.getHtml(homepageLink, realCookie, false);
+        }
         String fans = Strings.EMPTY;
         if (homepageJsonStr.contains("粉丝")) {
             int index = homepageJsonStr.indexOf("粉丝");
@@ -161,11 +166,11 @@ public class WeiBoJsonpHtmlServiceImpl implements WeiBoJsonpHtmlService {
         String relayLink = "https://weibo.com/aj/v6/mblog/info/big?ajwvr=6&id=" + relayKey + "&page=1";
         String relayJsonStr;
         try {
-            relayJsonStr = crawlerService.getHtml(relayLink, cookie);
+            relayJsonStr = crawlerService.getHtml(relayLink, cookie, true);
         } catch (Exception e) {
 //            cookie = "_s_tentry=link.csdn.net; Apache=7478629912745.258.1627205657412; SINAGLOBAL=7478629912745.258.1627205657412; ULV=1627205657422:1:1:1:7478629912745.258.1627205657412:; login_sid_t=66f5d667c5fc5cd5d8fcfaf87e7ba3d6; cross_origin_proto=SSL; SUB=_2A25MC9TiDeRhGeBK41AU9i7EwjyIHXVvYUEqrDV8PUNbmtAKLVLbkW9NR2ITSFnAJF4pS2SJDDjX-HCYeChZRdXZ; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWJKsUxaFmh3odVv9DisjkQ5JpX5KzhUgL.FoqX1hzfSo5R1K52dJLoI7DsIPiLeK.Reh5N; ALF=1659951153; SSOLoginState=1628415154; wvr=6; UOR=link.csdn.net,s.weibo.com,www.baidu.com; webim_unReadCount=%7B%22time%22%3A1628418522452%2C%22dm_pub_total%22%3A0%2C%22chat_group_client%22%3A0%2C%22chat_group_notice%22%3A0%2C%22allcountNum%22%3A1%2C%22msgbox%22%3A0%7D";
             cookie = weiBoCookieService.getCookie();
-            relayJsonStr = crawlerService.getHtml(relayLink, cookie);
+            relayJsonStr = crawlerService.getHtml(relayLink, cookie, true);
         }
         RelayEntity relayEntity = JSONObject.parseObject(relayJsonStr, RelayEntity.class);
         //第一页
@@ -218,11 +223,11 @@ public class WeiBoJsonpHtmlServiceImpl implements WeiBoJsonpHtmlService {
     private List<RelayParseData> getRelay(String relayLink, String cookie) {
         String relayJsonStr;
         try {
-            relayJsonStr = crawlerService.getHtml(relayLink, cookie);
+            relayJsonStr = crawlerService.getHtml(relayLink, cookie, true);
         } catch (Exception e) {
 //            cookie = "_s_tentry=link.csdn.net; Apache=7478629912745.258.1627205657412; SINAGLOBAL=7478629912745.258.1627205657412; ULV=1627205657422:1:1:1:7478629912745.258.1627205657412:; login_sid_t=66f5d667c5fc5cd5d8fcfaf87e7ba3d6; cross_origin_proto=SSL; SUB=_2A25MC9TiDeRhGeBK41AU9i7EwjyIHXVvYUEqrDV8PUNbmtAKLVLbkW9NR2ITSFnAJF4pS2SJDDjX-HCYeChZRdXZ; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWJKsUxaFmh3odVv9DisjkQ5JpX5KzhUgL.FoqX1hzfSo5R1K52dJLoI7DsIPiLeK.Reh5N; ALF=1659951153; SSOLoginState=1628415154; wvr=6; UOR=link.csdn.net,s.weibo.com,www.baidu.com; webim_unReadCount=%7B%22time%22%3A1628418522452%2C%22dm_pub_total%22%3A0%2C%22chat_group_client%22%3A0%2C%22chat_group_notice%22%3A0%2C%22allcountNum%22%3A1%2C%22msgbox%22%3A0%7D";
             cookie = weiBoCookieService.getCookie();
-            relayJsonStr = crawlerService.getHtml(relayLink, cookie);
+            relayJsonStr = crawlerService.getHtml(relayLink, cookie, true);
         }
         RelayEntity relayEntity = JSONObject.parseObject(relayJsonStr, RelayEntity.class);
         return parseRelay(relayEntity.getData().getHtml());

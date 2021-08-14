@@ -23,7 +23,7 @@ public class WeiBoCookieServiceImpl implements WeiBoCookieService {
         JSONObject obj;
         for(;;) {
             String url = "https://passport.weibo.com/visitor/visitor?a=incarnate&t=" + t + "&w=" + w + "&c=0" + "&gc=&cb=cross_domain&from=weibo&_rand=" + Math.random();
-            String body = crawlerService.getHtml(url, Strings.EMPTY);
+            String body = crawlerService.getHtml(url, Strings.EMPTY, true);
             body = body.replaceAll("window.cross_domain && cross_domain\\(", "");
             body = body.replaceAll("\\);", "");
             obj = JSONObject.fromObject(body).getJSONObject("data");
@@ -42,7 +42,7 @@ public class WeiBoCookieServiceImpl implements WeiBoCookieService {
 
     private String[] getTidAndC() {
         String url = "https://passport.weibo.com/visitor/genvisitor?cb=gen_callback";
-        String body = crawlerService.getHtml(url, Strings.EMPTY);
+        String body = crawlerService.getHtml(url, Strings.EMPTY, true);
         body = body.replaceAll("window.gen_callback && gen_callback\\(", "");
         body = body.replaceAll("\\);", "");
         JSONObject json = JSONObject.fromObject(body).getJSONObject("data");

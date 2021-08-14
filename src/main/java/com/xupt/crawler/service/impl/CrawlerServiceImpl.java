@@ -3,9 +3,7 @@ package com.xupt.crawler.service.impl;
 import com.xupt.crawler.service.CrawlerService;
 import com.xupt.crawler.utils.OkHttpClients;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -15,9 +13,9 @@ import org.springframework.util.StringUtils;
 public class CrawlerServiceImpl implements CrawlerService {
 
     @Override
-    public String getHtml(String url, String cookie) {
+    public String getHtml(String url, String cookie, boolean getOrPost) {
         OkHttpClient okHttpClient = OkHttpClients.getInstance();
-        Request request = getRequest(url, cookie);
+        Request request = getRequest(url, cookie, getOrPost);
         try (Response response = okHttpClient.newCall(request).execute()) {
             if (response.isSuccessful()) {
                 return response.body().string();
@@ -30,7 +28,7 @@ public class CrawlerServiceImpl implements CrawlerService {
         }
     }
 
-    private Request getRequest(String url, String cookie) {
+    private Request getRequest(String url, String cookie, boolean getOrPost) {
         Request.Builder builder = new Request.Builder()
                 .url(url)
                 .header(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36")
@@ -38,7 +36,12 @@ public class CrawlerServiceImpl implements CrawlerService {
                 .header(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.9")
                 .header(HttpHeaders.CONTENT_TYPE, "text/html; charset=utf-8");
         if (!StringUtils.isEmpty(cookie)) {
-            builder = builder.header(HttpHeaders.COOKIE, cookie).get();
+            builder = builder.header(HttpHeaders.COOKIE, cookie);
+        }
+        if (getOrPost) {
+            builder = builder.get();
+        } else {
+            builder = builder.post(new FormBody.Builder().build());
         }
         return builder.build();
     }

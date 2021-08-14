@@ -48,14 +48,14 @@ public class WeiBoCrawlerController {
         if (StringUtils.isEmpty(cookie)) {
             cookie = "login_sid_t=de193cdb5705dbbec9845b1ff1066006; cross_origin_proto=SSL; _s_tentry=passport.weibo.com; Apache=2715213965734.049.1628528513163; SINAGLOBAL=2715213965734.049.1628528513163; ULV=1628528513170:1:1:1:2715213965734.049.1628528513163:; SSOLoginState=1628528543; wvr=6; ALF=1631292502; SUB=_2A25MF48GDeRhGeFO71cZ9ynKzD2IHXVv-xFOrDV8PUJbkNAKLUKskW1NQX2SaHrDwd-OBaDRnNkQbwAsvGwGrcqS; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWy-0OHLUGk2zHbbephEVRn5JpX5oz75NHD95QNehBf1hMNSoMpWs4Dqcjqi--fi-2Ei-2Ri--Ri-i2i-24eo5pSK5f; webim_unReadCount=%7B%22time%22%3A1628866976870%2C%22dm_pub_total%22%3A4%2C%22chat_group_client%22%3A0%2C%22chat_group_notice%22%3A0%2C%22allcountNum%22%3A63%2C%22msgbox%22%3A0%7D";
         }
-        String jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, null), cookie);
+        String jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, null), cookie, true);
         int pageCount = weiBoJsonpHtmlService.parsePageCount(jsonStr);
         if (page < 1 || page > pageCount) {
             throw new RuntimeException(String.format("param page error, totalPage: %s", pageCount));
         }
         if (page == pageCount) {
             int firstPageSize = weiBoJsonpHtmlService.parsePageSize(jsonStr);
-            jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, page), cookie);
+            jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, page), cookie, true);
             List<WeiboDomain> weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr, cookie);
             PageResult<WeiboDomain> result = new PageResult<>();
             result.setPageNum(page);
@@ -65,13 +65,13 @@ public class WeiBoCrawlerController {
             result.setItems(weiboDomains);
             return JsonResult.ok(result);
         } else {
-            String lastPageJsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, pageCount), cookie);
+            String lastPageJsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, pageCount), cookie, true);
             int lastPageSize =  weiBoJsonpHtmlService.parsePageSize(lastPageJsonStr);
             List<WeiboDomain> weiboDomains;
             if (page == 1) {
                 weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr, cookie);
             } else {
-                jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, page), cookie);
+                jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, page), cookie, true);
                 weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr, cookie);
             }
             PageResult<WeiboDomain> result = new PageResult<>();
@@ -93,7 +93,7 @@ public class WeiBoCrawlerController {
         if (StringUtils.isEmpty(cookie)) {
             cookie = "login_sid_t=de193cdb5705dbbec9845b1ff1066006; cross_origin_proto=SSL; _s_tentry=passport.weibo.com; Apache=2715213965734.049.1628528513163; SINAGLOBAL=2715213965734.049.1628528513163; ULV=1628528513170:1:1:1:2715213965734.049.1628528513163:; SSOLoginState=1628528543; wvr=6; ALF=1631292502; SUB=_2A25MF48GDeRhGeFO71cZ9ynKzD2IHXVv-xFOrDV8PUJbkNAKLUKskW1NQX2SaHrDwd-OBaDRnNkQbwAsvGwGrcqS; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9WWy-0OHLUGk2zHbbephEVRn5JpX5oz75NHD95QNehBf1hMNSoMpWs4Dqcjqi--fi-2Ei-2Ri--Ri-i2i-24eo5pSK5f; webim_unReadCount=%7B%22time%22%3A1628866976870%2C%22dm_pub_total%22%3A4%2C%22chat_group_client%22%3A0%2C%22chat_group_notice%22%3A0%2C%22allcountNum%22%3A63%2C%22msgbox%22%3A0%7D";
         }
-        String jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, null), cookie);
+        String jsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, null), cookie, true);
         int pageCount = weiBoJsonpHtmlService.parsePageCount(jsonStr);
         List<WeiboDomain> weiboDomains =  weiBoJsonpHtmlService.parseData(jsonStr, cookie);
         List<WeiboDomain> allWeiboDomains = new ArrayList<>(weiboDomains);
@@ -101,7 +101,7 @@ public class WeiBoCrawlerController {
         for (int i = 2; i <= pageCount; i++) {
             int finalI = i;
             pageParseCompleteService.submit(() -> {
-                String pageJsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, finalI), finalCookie);
+                String pageJsonStr = crawlerService.getHtml(getUrl(q, startTime, endTime, finalI), finalCookie, true);
                 return weiBoJsonpHtmlService.parseData(pageJsonStr, finalCookie);
             });
         }
