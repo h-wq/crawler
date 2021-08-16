@@ -106,8 +106,12 @@ public class WeiBoJsonpHtmlServiceImpl implements WeiBoJsonpHtmlService {
         String homepageJsonStr;
         try {
             homepageJsonStr = crawlerService.getHtml(homepageLink, realCookie, true);
-        } catch (Exception e) {
-            homepageJsonStr = crawlerService.getHtml(homepageLink, realCookie, false);
+        } catch (Exception e1) {
+            try {
+                homepageJsonStr = crawlerService.getHtml(homepageLink, realCookie, false);
+            } catch (Exception e2) {
+                homepageJsonStr = Strings.EMPTY;
+            }
         }
         String fans = Strings.EMPTY;
         if (homepageJsonStr.contains("粉丝")) {
